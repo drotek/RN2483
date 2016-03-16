@@ -1,7 +1,7 @@
 RN2483 Breakout Board
 =====================
 
-[![BME280 breakout board](http://www.drotek.com/ftp/photo/drotek%20bmp280%20I2C.jpg)
+[![RN2483 LORA breakout board](http://www.drotek.com/ftp/photo/drotek%20lora%20rn2483.jpg)
 
 Microchip’s Long-Range Low-Power End Node Solution.
 With the growing Internet of Things, Microchip has a LoRa® Technology wireless solution to address increasing demands on end-devices for long range connectivity, low power for battery operation, and low infrastructure cost for volume deployment. 
