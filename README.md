@@ -12,7 +12,7 @@ Microchip’s LoRa technology solution is ready to run out-of-the box and with t
 
 Repository Contents
 -------------------
-* **/Software** - Arduino libraryneeded to used this product. 
+* **/Software** - Arduino library needed to used this product with Arduino board
 * **/Hardware** - PDF design files
 
 License Information
