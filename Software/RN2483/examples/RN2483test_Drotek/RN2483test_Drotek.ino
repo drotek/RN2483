@@ -10,26 +10,25 @@
 
 #include <SoftwareSerial.h>
 #include "RN2483.h"
+#define TX
 
-String str;
+
+const int ledPin =  13;      // the number of the LED pin
+int ledState = LOW;          // ledState used to set the LED
 
 /***************************************
 *                setup                 *
 ***************************************/
 void setup() 
 {
-  Serial.begin(9600);
+  Serial.begin(57600);
   Serial.println("RN2483 Test");
+  
+   // set the digital pin as output:
+  pinMode(ledPin, OUTPUT);
   
   RN2483_init();
 
-  /*pinMode(5, OUTPUT);
-  digitalWrite(5, HIGH);
-  delay(50);
-  digitalWrite(5, LOW);
-  delay(50);
-  digitalWrite(5, HIGH);
-  delay(50);*/
 }
 
 /***************************************
@@ -38,48 +37,41 @@ void setup()
 void loop() {
 
 #ifdef TX
-  char msgBuf[40] = "helloworld";
-  //sprintf(msgBuf, "{\"temp\":%d.%01d}", (int)temperature, (int)(temperature * 10) % 10);
-  Serial.println(msgBuf);
-  RN2483_sendData(msgBuf);
-
-  delay(60000);
+  
+  char msgBuf[45];// = "01234567890123456789012345678901234567890123";
+  
+  for (int i=0; i<10; i++)
+  {
+    sprintf(msgBuf, "0123456789012345678901234567890123456789%d", (int)i);
+    RN2483_sendData(msgBuf);
+    
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW)
+      ledState = HIGH;
+    else
+      ledState = LOW;
+      
+    // set the LED with the ledState of the variable:
+    digitalWrite(ledPin, ledState);
+    
+    if (i==9) i=0;
+  }
 #endif
 
 
 #ifdef RX
-
-#endif
-}
-
-
-
-
-
-#ifdef toto
-
-  // switch recieve mode
-  Serial.println("radio rx 0");
-  str = Serial.readStringUntil('\n');
+  RN2483_receiveData(); 
   
-  if ( str.indexOf("ok") == 0 ) {
-    int ok=0;
-    while ( ok == 0 ) {
-       str = Serial.readStringUntil('\n');
-       if ( str.length() > 1 ) {
-          if ( str.indexOf("radio_rx") >= 0 ) {
-            if ( str.indexOf("0123456789AB") >= 0 ) {
-              int j;
-              for ( j = 0 ; j < 10 ; j++) {
-                 digitalWrite(3,HIGH);
-                 delay(100);
-                 digitalWrite(3,LOW);
-                 delay(100);
-              }
-            }
-            ok = 1;
-         }
-      }
-  } 
-}
+  // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW)
+      ledState = HIGH;
+    else
+      ledState = LOW;
+      
+    // set the LED with the ledState of the variable:
+    digitalWrite(ledPin, ledState);
 #endif
+
+}
+
+
