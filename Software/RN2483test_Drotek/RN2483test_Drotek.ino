@@ -10,7 +10,7 @@
 
 #include <SoftwareSerial.h>
 #include "RN2483.h"
-#define TX
+#define RX_RN2483
 
 
 const int ledPin =  13;      // the number of the LED pin
@@ -21,7 +21,7 @@ int ledState = LOW;          // ledState used to set the LED
 ***************************************/
 void setup() 
 {
-  Serial.begin(57600);
+  Serial.begin(9600);
   Serial.println("RN2483 Test");
   
    // set the digital pin as output:
@@ -36,42 +36,58 @@ void setup()
 ***************************************/
 void loop() {
 
-#ifdef TX
-  
-  char msgBuf[45];// = "01234567890123456789012345678901234567890123";
-  
-  for (int i=0; i<10; i++)
-  {
-    sprintf(msgBuf, "0123456789012345678901234567890123456789%d", (int)i);
-    RN2483_sendData(msgBuf);
-    
-    // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW)
-      ledState = HIGH;
-    else
-      ledState = LOW;
-      
-    // set the LED with the ledState of the variable:
-    digitalWrite(ledPin, ledState);
-    
-    if (i==9) i=0;
-  }
+#ifdef TX_RN2483
+ 
+  /*byte val = B01011010;
+  Serial.print("Valeur lue dans serialEvent: ");
+  Serial.println(val,HEX);
+  RN2483_sendData(val);*/
 #endif
 
 
-#ifdef RX
+#ifdef RX_RN2483
   RN2483_receiveData(); 
   
   // if the LED is off turn it on and vice-versa:
-    if (ledState == LOW)
-      ledState = HIGH;
-    else
-      ledState = LOW;
+  if (ledState == LOW)  ledState = HIGH;
+  else                  ledState = LOW;
+      
+   // set the LED with the ledState of the variable:
+   digitalWrite(ledPin, ledState);
+#endif
+
+}
+
+
+/***************************************
+*            serialEvent               *
+***************************************/
+void serialEvent() 
+{
+  char inChar; //[45];
+  byte val;
+  
+  while (Serial.available()) 
+  { 
+    val = Serial.read();
+     
+    Serial.print("Valeur lue dans serialEvent: ");
+    Serial.print("   DEC: ");
+    Serial.print(val,DEC);
+    Serial.print("   HEX: 0X");
+    Serial.print(val,HEX);
+    Serial.print("   BIN: ");
+    Serial.println(val,BIN);
+    RN2483_sendData(val);
+    
+    // if the LED is off turn it on and vice-versa:
+    if (ledState == LOW)  ledState = HIGH;
+    else                  ledState = LOW;
       
     // set the LED with the ledState of the variable:
     digitalWrite(ledPin, ledState);
-#endif
-
+   
+  }
 }
 
 

@@ -54,59 +54,62 @@ char RN2483_getHexLo( char ch )
 /***************************************
 *               sendData               *
 ***************************************/
-void RN2483_sendData( char *data) 
-{
-  Serial.write( "radio tx " );
-  lora.write( "radio tx " );
-  // Write data as hex characters
-  char *ptr = data;
-  int idiotCount = 45;
-  while (*ptr && idiotCount ) 
-  {
-    lora.write( RN2483_getHexHi( *ptr ) );
-    lora.write( RN2483_getHexLo( *ptr ) );
+void RN2483_sendData( byte data) 
+{ 
+   Serial.write( "radio tx " );
+   lora.write( "radio tx " );
 
-    Serial.write( RN2483_getHexHi( *ptr ) );
-    Serial.write( RN2483_getHexLo( *ptr ) );
-
-    ptr++;
-    idiotCount--;
-  }
-  lora.write("\r\n");
-  Serial.write("\n");
-
-  /*while (lora.available())
-    Serial.write(lora.read());*/
+   lora.print( data );
+   lora.print("\r\n");
     
-   delay(100);
+   Serial.println(data,HEX);
+   Serial.write("\n");
+
+   // to check the feedback of the RN2483
+   /*while (lora.available())
+     Serial.write(lora.read());*/
+    
+    delay(100);
 }
 
 /***************************************
 *             receiveData              *
 ***************************************/
 void RN2483_receiveData() 
-{    
+{  
+   
   // switch recieve mode
   lora.println("radio rx 0");
   str = lora.readStringUntil('\n');
   
   if ( str.indexOf("ok") == 0 ) 
   {
-       //Serial.println("while");
        str = lora.readStringUntil('\n');
        
        if ( str.length() > 1 ) 
        {
+          //Serial.println(str.length() - 11);
+          
           if ( str.indexOf("radio_rx") >= 0 ) 
-          {
-            //while (lora.available())
-              Serial.println(str);
-            
+          {           
+              str = str.substring(10);
+              
+              //Serial.print("str: ");
+              //Serial.println(str);
+              
+              int val;
+              val = str.toInt();
+             
+              Serial.print("Received data by RN2483: ");
+              Serial.print("   DEC: ");
+              Serial.print(val,DEC);
+              Serial.print("   HEX: 0X");
+              Serial.print(val,HEX);
+              Serial.print("   BIN: ");
+              Serial.println(val,BIN);             
          }
-      }
-     
+      }   
   }
-
 }
 
 /***************************************
