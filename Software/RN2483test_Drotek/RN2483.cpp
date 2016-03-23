@@ -1,9 +1,13 @@
 #include <SoftwareSerial.h>
 #include "arduino.h"
+#include "RN2483.h"
 
+byte mask = 0xFF;
+byte b;
+SoftwareSerial lora(3, 4);   // RX, TX
+String str, str2;
+int ledState2 = LOW;         // ledState used to set the LED
 
-SoftwareSerial lora(3, 4); // RX, TX
-String str;
 
 /***************************************
 *                sendCmd               *
@@ -26,50 +30,30 @@ void RN2483_sendCmd( char *cmd)
 ***************************************/
 void RN2483_waitForResponse() 
 {
-  /*while (!lora.available() ) 
-    delay(100);*/
-  
   while (lora.available())
     Serial.write(lora.read());
 }
 
-/***************************************
-*               getHexHi               *
-***************************************/
-char RN2483_getHexHi( char ch ) 
-{  
-  char nibble = ch >> 4;
-  return (nibble > 9) ? nibble + 'A' - 10 : nibble + '0';
-}
-
-/***************************************
-*               getHexLo               *
-***************************************/
-char RN2483_getHexLo( char ch ) 
-{
-  char nibble = ch & 0x0f;
-  return (nibble > 9) ? nibble + 'A' - 10 : nibble + '0';
-}
 
 /***************************************
 *               sendData               *
 ***************************************/
-void RN2483_sendData( byte data) 
+void RN2483_sendData( byte data[]) 
 { 
-   Serial.write( "radio tx " );
+   //Serial.write( "radio tx " );
    lora.write( "radio tx " );
 
-   lora.print( data );
+   for (int k=0; k<MAX_SIZE_TRAME ;k++)
+   {
+     lora.print( data[k] );
+     Serial.write( data[k]);
+     
+   }
    lora.print("\r\n");
-    
-   Serial.println(data,HEX);
-   Serial.write("\n");
 
    // to check the feedback of the RN2483
    /*while (lora.available())
      Serial.write(lora.read());*/
-    
-    delay(100);
 }
 
 /***************************************
@@ -82,31 +66,41 @@ void RN2483_receiveData()
   lora.println("radio rx 0");
   str = lora.readStringUntil('\n');
   
+  
   if ( str.indexOf("ok") == 0 ) 
   {
+       // if the LED is off turn it on and vice-versa:
+       if (ledState2 == LOW)  ledState2 = HIGH;
+       else                   ledState2 = LOW;
+      
+       // set the LED with the ledState of the variable:
+       digitalWrite(LEDPIN, ledState2);
+       
+   
        str = lora.readStringUntil('\n');
+       //Serial.println(str );
        
        if ( str.length() > 1 ) 
        {
-          //Serial.println(str.length() - 11);
+          //Serial.println(str.length() );
           
           if ( str.indexOf("radio_rx") >= 0 ) 
-          {           
+          {   
+              // keep just the hexa data        
               str = str.substring(10);
               
-              //Serial.print("str: ");
-              //Serial.println(str);
+              //Serial.println(str.length() );
               
-              int val;
-              val = str.toInt();
-             
-              Serial.print("Received data by RN2483: ");
-              Serial.print("   DEC: ");
-              Serial.print(val,DEC);
-              Serial.print("   HEX: 0X");
-              Serial.print(val,HEX);
-              Serial.print("   BIN: ");
-              Serial.println(val,BIN);             
+              for (int l=0; l<(str.length()-2); l=l+2)
+              {
+                str2 = str.substring(l,l+2);
+              
+                int val;
+                val = str2.toInt();
+                b = val & mask;
+                Serial.write(b);
+              }
+                          
          }
       }   
   }
