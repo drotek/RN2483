@@ -75,23 +75,18 @@ void RN2483_receiveData()
       
        // set the LED with the ledState of the variable:
        digitalWrite(LEDPIN, ledState2);
-       
-   
+        
        str = lora.readStringUntil('\n');
-       //Serial.println(str );
        
        if ( str.length() > 1 ) 
-       {
-          //Serial.println(str.length() );
-          
+       {        
           if ( str.indexOf("radio_rx") >= 0 ) 
           {   
               // keep just the hexa data        
-              str = str.substring(10);
+              str = str.substring(10);             
               
-              //Serial.println(str.length() );
-              
-              for (int l=0; l<(str.length()-2); l=l+2)
+              //for (int l=0; l<(str.length()-2); l=l+2)
+              for (int l=0; l<(MAX_SIZE_TRAME*2-2); l=l+2)
               {
                 str2 = str.substring(l,l+2);
               

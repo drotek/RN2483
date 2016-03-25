@@ -11,7 +11,7 @@
 #include <SoftwareSerial.h>
 #include "RN2483.h"
 
-#define RX_RN2483
+//#define RX_RN2483  // enable only for the LORA receiver
 
 int ledState = LOW;          // ledState used to set the LED
 byte val[MAX_SIZE_TRAME];
@@ -52,7 +52,7 @@ void serialEvent()
   while (Serial.available()) 
   { 
     val[i] = Serial.read(); 
-    i++;
+    i++;    
     
     if (i==MAX_SIZE_TRAME)
     {   
